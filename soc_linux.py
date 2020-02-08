@@ -145,7 +145,7 @@ def SoCLinux(soc_cls, **kwargs):
 
         def add_framebuffer(self, video_settings):
             platform = self.platform
-            assert platform.device[:4] == "xc7a"
+            #assert platform.device[:4] == "xc7a"
             dram_port = self.sdram.crossbar.get_port(
                 mode="read",
                 data_width=32,
@@ -153,19 +153,19 @@ def SoCLinux(soc_cls, **kwargs):
                 reverse=True)
             framebuffer = VideoOut(
                 device=platform.device,
-                pads=platform.request("hdmi_out"),
+                pads=platform.request("vga_out"),
                 dram_port=dram_port)
             self.submodules.framebuffer = framebuffer
             self.add_csr("framebuffer")
 
-            framebuffer.driver.clocking.cd_pix.clk.attr.add("keep")
-            framebuffer.driver.clocking.cd_pix5x.clk.attr.add("keep")
-            platform.add_period_constraint(framebuffer.driver.clocking.cd_pix.clk, 1e9/video_settings["pix_clk"])
-            platform.add_period_constraint(framebuffer.driver.clocking.cd_pix5x.clk, 1e9/(5*video_settings["pix_clk"]))
-            platform.add_false_path_constraints(
-                self.crg.cd_sys.clk,
-                framebuffer.driver.clocking.cd_pix.clk,
-                framebuffer.driver.clocking.cd_pix5x.clk)
+            #framebuffer.driver.clocking.cd_pix.clk.attr.add("keep")
+            #framebuffer.driver.clocking.cd_pix5x.clk.attr.add("keep")
+            #platform.add_period_constraint(framebuffer.driver.clocking.cd_pix.clk, 1e9/video_settings["pix_clk"])
+            #platform.add_period_constraint(framebuffer.driver.clocking.cd_pix5x.clk, 1e9/(5*video_settings["pix_clk"]))
+            #platform.add_false_path_constraints(
+            #    self.crg.cd_sys.clk,
+            #    framebuffer.driver.clocking.cd_pix.clk,
+            #    framebuffer.driver.clocking.cd_pix5x.clk)
 
             self.add_constant("litevideo_pix_clk", video_settings["pix_clk"])
             self.add_constant("litevideo_h_active", video_settings["h-active"])
