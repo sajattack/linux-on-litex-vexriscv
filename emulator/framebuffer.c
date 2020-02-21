@@ -6,8 +6,9 @@
 
 #include "framebuffer.h"
 
+#define FRAMEBUFFER_MODE_320X240
 //#define FRAMEBUFFER_MODE_640X480
-#define FRAMEBUFFER_MODE_1280X720
+//#define FRAMEBUFFER_MODE_1280X720
 
 struct video_timing {
 	unsigned int pixel_clock; /* in tens of kHz */
@@ -81,8 +82,24 @@ static void framebuffer_clkgen_write(int m, int d)
 void framebuffer_init(void)
 {
 	unsigned int m, d;
+
+#ifdef FRAMEBUFFER_MODE_320X240
+    struct video_timing mode = {
+        .pixel_clock = 640,
+        .h_active = 320,
+        .h_blanking = 50,
+        .h_sync_offset = 16,
+        .h_sync_width = 16,
+
+        .v_active = 240,
+        .v_blanking = 40,
+        .v_sync_offset = 1,
+        .v_sync_width = 2,
+    };
+
+#endif
 #ifdef FRAMEBUFFER_MODE_640X480
-	struct video_timing mode = {
+    struct video_timing mode = {
 		// 640x480 @ 75Hz
 		.pixel_clock = 3150,
 
@@ -120,8 +137,8 @@ void framebuffer_init(void)
 		(mode.pixel_clock*10000)/((mode.h_active + mode.h_blanking)*(mode.v_active + mode.v_blanking)));
 
 	/* configure clock */
-	framebuffer_get_clock_md(10*(mode.pixel_clock), &m, &d);
-	framebuffer_clkgen_write(m, d);
+//	framebuffer_get_clock_md(10*(mode.pixel_clock), &m, &d);
+//	framebuffer_clkgen_write(m, d);
 
 	/* configure timings */
 	framebuffer_core_initiator_hres_write(mode.h_active);

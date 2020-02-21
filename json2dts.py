@@ -259,10 +259,10 @@ if "xadc" in d["csr_bases"]:
 if "framebuffer" in d["csr_bases"]:
     # FIXME: dynamic framebuffer base and size
     framebuffer_base   = 0xc8000000
-    framebuffer_width  = 1280
-    framebuffer_height = 720
+    framebuffer_width  = 320
+    framebuffer_height = 240
     dts += """
-		framebuffer0: framebuffer@f0000000 {{
+		framebuffer0: framebuffer@c8000000 {{
 			compatible = "simple-framebuffer";
 			reg = <0x0 0x{framebuffer_base:x} 0x0 0x{framebuffer_size:x}>;
 			width = <{framebuffer_width}>;
