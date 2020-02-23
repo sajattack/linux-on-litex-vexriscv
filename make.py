@@ -220,7 +220,7 @@ class De10Lite(Board):
 class De10Nano(Board):
     def __init__(self):
         from litex_boards.targets import de10nano
-        Board.__init__(self, de10nano.MiSTerSDRAMSoC, {"serial", "leds", "switches", "framebuffer"})
+        Board.__init__(self, de10nano.MiSTerSDRAMSoC, {"serial", "leds", "switches", "vga_terminal"})
 
     def load(self):
         from litex.build.altera import USBBlaster
@@ -312,8 +312,11 @@ def main():
             soc.add_i2c()
         if "xadc" in board.soc_capabilities:
             soc.add_xadc()
-        if "framebuffer" in board.soc_capabilities:
+        if "framebuffer" in board.soc_capabilities and "vga_terminal" not in board.soc_capabilites:
             soc.add_framebuffer()
+        if "vga_terminal" in board.soc_capabilities and  "framebuffer" not in board.soc_capabilities:
+            soc.add_vga_terminal()
+
         if "icap_bit" in board.soc_capabilities:
             soc.add_icap_bitstream()
         soc.configure_boot()

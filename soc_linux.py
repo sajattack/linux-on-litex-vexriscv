@@ -120,14 +120,14 @@ def SoCLinux(soc_cls, **kwargs):
             self.submodules.framebuffer = framebuffer
             self.add_csr("framebuffer")
 
-            #framebuffer.driver.clocking.cd_pix.clk.attr.add("keep")
-            #framebuffer.driver.clocking.cd_pix5x.clk.attr.add("keep")
-            #platform.add_period_constraint(framebuffer.driver.clocking.cd_pix.clk, 1e9/video_settings["pix_clk"])
-            #platform.add_period_constraint(framebuffer.driver.clocking.cd_pix5x.clk, 1e9/(5*video_settings["pix_clk"]))
-            #platform.add_false_path_constraints(
-            #    self.crg.cd_sys.clk,
-            #    framebuffer.driver.clocking.cd_pix.clk,
-            #    framebuffer.driver.clocking.cd_pix5x.clk)
+            # framebuffer.driver.clocking.cd_pix.clk.attr.add("keep")
+            # framebuffer.driver.clocking.cd_pix5x.clk.attr.add("keep")
+            # platform.add_period_constraint(framebuffer.driver.clocking.cd_pix.clk, 1e9/video_settings["pix_clk"])
+            # platform.add_period_constraint(framebuffer.driver.clocking.cd_pix5x.clk, 1e9/(5*video_settings["pix_clk"]))
+            # platform.add_false_path_constraints(
+               # self.crg.cd_sys.clk,
+               # framebuffer.driver.clocking.cd_pix.clk,
+               # framebuffer.driver.clocking.cd_pix5x.clk)
             
             # framebuffer.driver.clocking.cd_pix.clk.attr.add("keep")
             # framebuffer.driver.clocking.cd_pix5x.clk.attr.add("keep")
@@ -137,6 +137,32 @@ def SoCLinux(soc_cls, **kwargs):
                 # self.crg.cd_sys.clk,
                 # framebuffer.driver.clocking.cd_pix.clk,
                 # framebuffer.driver.clocking.cd_pix5x.clk)
+
+        def add_vga_terminal(self):
+            platform = self.platform
+            import gen 
+            from litevideo.terminal.core import Terminal
+            from litex.soc.cores.uart import UARTCrossover
+            from litex.soc.interconnect.stream import SyncFIFO
+
+            self.submodules.terminal = terminal = Terminal()
+            self.submodules.gen = gen = (gen.Generator(scroll=True))
+
+            vga = platform.request("vga_out", 0)
+            
+            self.submodules.fifo = fifo = SyncFIFO([('data', 8)], 128, True)
+
+            self.comb += [
+                vga.vsync_n.eq(~terminal.vsync),
+                vga.hsync_n.eq(~terminal.hsync),
+                vga.r.eq(terminal.red),
+                vga.g.eq(terminal.green),
+                vga.b.eq(terminal.blue),
+                gen.bus.connect(terminal.bus),
+                fifo.source.connect(gen.sink),
+                self.uart.source.connect(gen.sink, omit=['ready', 'valid']),
+                gen.sink.valid.eq(self.uart.source.valid & self.uart.source.ready)
+            ]
 
         def add_icap_bitstream(self):
             self.submodules.icap_bit = ICAPBitstream();
