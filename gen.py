@@ -94,7 +94,7 @@ class Generator(Module):
 
         
 
-        line_end = 57
+        line_end = 79
         line_wrap = Signal()
 
 
@@ -102,7 +102,7 @@ class Generator(Module):
             If(address == line_end*2,
                 NextValue(line_wrap,1),
                 bus.dat_w.eq(170),
-                bus.adr.eq(address + 80*2*19),
+                bus.adr.eq(address + 80*2*29),
                 bus.cyc.eq(1),
                 bus.stb.eq(1),
                 bus.we.eq(1),
@@ -114,7 +114,7 @@ class Generator(Module):
                 )
             ).Else(
                 bus.dat_w.eq(char),
-                bus.adr.eq(address + 80*2*19),
+                bus.adr.eq(address + 80*2*29),
                 bus.cyc.eq(1),
                 bus.stb.eq(1),
                 bus.we.eq(1),
@@ -130,7 +130,7 @@ class Generator(Module):
 
         fsm.act('ADD_COLOUR',
             bus.dat_w.eq(textColour),
-            bus.adr.eq(address + 80*2*19),
+            bus.adr.eq(address + 80*2*29),
             bus.cyc.eq(1),
             bus.stb.eq(1),
             bus.we.eq(1),
@@ -189,7 +189,7 @@ class Generator(Module):
                 NextValue(dst_address, dst_address + 1),
 
 
-                If(dst_address >= ((80*2*19)-2),
+                If(dst_address >= ((80*2*29)-2),
                     NextState('CLEAR-LINE'),
                     NextValue(address, 0)
                 ),
@@ -198,7 +198,7 @@ class Generator(Module):
 
         fsm.act('CLEAR-LINE',
             bus.dat_w.eq(0),
-            bus.adr.eq(address  + 80*2*19 ),
+            bus.adr.eq(address  + 80*2*29 ),
             bus.cyc.eq(1),
             bus.stb.eq(1),
             bus.we.eq(1),
